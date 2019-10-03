@@ -38,14 +38,32 @@ class Bullet(arcade.Sprite):
         Moves the bullet
         '''
         self.center_x += self.dx
+        self.center_y += self.dy  
+class Bullet(arcade.Sprite):
+    def __init__(self, position, velocity, damage):
+        ''' 
+        initializes the bullet
+        Parameters: position: (x,y) tuple
+            velocity: (dx, dy) tuple
+            damage: int (or float)
+        '''
+        super().__init__("assets/bullet_enemy.png", 0.5)
+        (self.center_x, self.center_y) = position
+        (self.dx, self.dy) = velocity
+        self.damage = damage
+        enemy_bullet = random.choice(enemy_bullet)
+    def update(self):
+        '''
+        Moves the bullet
+        '''
+        self.center_x += self.dx
         self.center_y += self.dy
 
-
-    
 class Player(arcade.Sprite):
     def __init__(self):
         super().__init__("assets/narwhal.png", 0.5)
         (self.center_x, self.center_y) = STARTING_LOCATION
+ 
 
 class Enemy(arcade.Sprite):
     def __init__(self, position):
@@ -56,10 +74,6 @@ class Enemy(arcade.Sprite):
         super().__init__("assets/penguin.png", 0.5)
         self.hp = ENEMY_HP
         (self.center_x, self.center_y) = position
-        
-
-        
-
 
 class Window(arcade.Window):
 
@@ -84,7 +98,7 @@ class Window(arcade.Window):
             y = 500
             enemy = Enemy((x,y))
             self.enemy_list.append(enemy)            
-            self.player.kill()
+            self.player.kill()  
 
     def update(self, delta_time):
         self.bullet_list.update()
@@ -99,7 +113,18 @@ class Window(arcade.Window):
                 else:
                     self.score = self.score + HIT_SCORE
                     self.bullet_list[0].kill()
-
+    def update(self, delta_time):
+        self.bullet_enemy_list.update()                
+        for e in self.player_list:
+             if arcade.check_for_collision_with_list(e, self.bullet_enemy_list):
+                e.hp -= 10
+                if e.hp < 0: 
+                    self.score = self.score + KILL_SCORE
+                    e.kill()
+                    self.bullet_list[0].kill()
+                else:
+                    self.score = self.score + HIT_SCORE
+                    self.bullet_list[0].kill()
             # for every bullet that hits, decrease the hp and then see if it dies
             # increase the score
              
